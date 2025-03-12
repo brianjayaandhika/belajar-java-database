@@ -1,0 +1,55 @@
+Java - Database
+1. JDBC (Java Database Connectivity) adalah sebuah API yang memungkinkan aplikasi Java untuk berinteraksi
+dengan database, termasuk menjalankan query dan mengelola data.
+
+2. Agar JDBC dapat berkomunikasi dengan database, diperlukan driver yang sesuai dengan jenis database
+yang digunakan. Contohnya, MySQL menggunakan MySQL JDBC Driver (mysql-connector-java).
+
+Contoh lain:
+MySQL → mysql-connector-java
+PostgreSQL → postgresql
+SQL Server → mssql-jdbc
+
+3. Untuk membuat koneksi ke database, kita dapat menggunakan metode statis dari DriverManager, yaitu:
+
+Connection connection = DriverManager.getConnection(url, username, password);
+
+Namun, cara ini tidak direkomendasikan dalam aplikasi skala besar karena jumlah koneksi ke database
+memiliki batasan tertentu. Sebagai contoh, MySQL secara default membatasi 151 koneksi yang dapat
+dibuka secara bersamaan dan apabila koneksi melewati batas tersebut, maka aplikasi dapat mengalami error.
+Oleh karena itu, Connection Pooling lebih disarankan.
+
+4. Connection Pooling adalah teknik untuk mengelola koneksi database dengan cara membuat
+sekumpulan koneksi yang dapat dipinjam dan dikembalikan oleh pengguna.
+
+Misalnya, jika terdapat 150 koneksi dalam pool, pengguna akan "meminjam" koneksi dari pool saat mengakses database.
+Setelah selesai digunakan, koneksi akan dikembalikan ke pool agar dapat digunakan kembali oleh pengguna lain.
+Jika semua koneksi dalam pool sedang digunakan, permintaan baru akan dimasukkan ke dalam antrean hingga ada
+yang tersedia kembali.
+
+Implementasi Connection Pooling dapat dibantu dengan library HikariCP
+
+5. Penggunaan HikariCP membutuhkan beberapa konfigurasi
+    a. setMaximumPoolSize   -> untuk menentukan jumlah pool
+    b. setMinimumIdle       -> kalau tiba2 CP gak ada yg pake, itu kan buagn2 resource, maka akan diclose
+        koneksinya, tapi tetap akan menyisakan minimum koneksinya, disisakan agar apabila tiba2 trafficnya naik,
+        CP sudah siap untuk handle.
+    c. setIdleTimeout       -> berapa lama hingga di close koneksinya apabila tidak ada yg menggunakan
+    d. setMaxLifetime       -> apabila ada connection yang terlalu lama (melebihi batas maxlifetime), itu nanti
+        otomatis dibuka kembali (ditutup dan dibuka lagi)
+
+6. Saat kita sudah ter-connect ke database via Connection, kita pasti ingin mengirim perintah SQL ke database,
+Connection adalah object jembatan koneksi dari aplikasi ke database via JDBC. Untuk mengirim SQL kita bisa
+menggunakan beberapa object, salah satunya adalah Statement.
+
+Statement adalah interface yang bisa digunakan untuk mengirim SQL ke database, sekaligus menerima respon.
+Jangan lupa untuk menutup Statement dengan .close()
+
+7. Beberapa method yang dapat digunakan:
+    a. Statement.executeUpdate(String sqlQuery)
+        -> Digunakan untuk mengirimkan perintah SQL insert, update, delete atau apapun yang tidak membutuhkan result
+        -> Bahkan juga bisa digunakan untuk execute SQL DDL, walaupun tidak sesuai dengan best practice.
+        -> Mengembalikan int, yang berupa berapa banyak data yang terkena impact perintah SQL
+    b. Statement.executeQuery(String query)
+        -> Untuk perintah SQL yang mengembalikan data
+        -> Return berupa object java.sql.ResultSet, berisikan data-data query SQL

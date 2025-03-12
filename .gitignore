@@ -1,0 +1,37 @@
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.iws
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Compiled Java files
+*.class
+
+# Maven dependencies
+target/
+
+# Gradle files
+.gradle/
+build/
+
+# JAR/WAR files
+*.jar
+*.war
+*.ear
+
+# Generated files
+out/
+
+# IDE-specific files
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Git specific
+.gitignore

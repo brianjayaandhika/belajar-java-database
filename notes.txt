@@ -53,3 +53,53 @@ Jangan lupa untuk menutup Statement dengan .close()
     b. Statement.executeQuery(String query)
         -> Untuk perintah SQL yang mengembalikan data
         -> Return berupa object java.sql.ResultSet, berisikan data-data query SQL
+
+8. ResultSet adalah hasil dari Statement.executeQuery, yang merupakan representasi data hasil query.
+    -> Mirip seperti iterator, sehingga bisa dilakukan perulangan untuk mendapatkan data tiap recordnya
+    -> Cara kerja ResultSet itu seperti cursor, dimana kita bisa maju atau mundur dari posisi tertentu
+        -> Maju dengan next() dan mundur dengan previous()
+    -> Untuk mendapatkan data tiap kolom, pada saat di posisi cursor, kita dapat menggunakan sangat banyak method
+        getXxx(column) di ResultSet, tergantung tipe data columnnya
+
+9. SQL Injection adalah sebuah teknik yang menyalahgunakan sebuah celah keamanan yang terjadi dalam
+lapisan basis data sebuah aplikasi, contoh SQL Injection apabila kita menggunakan statement
+
+String username = "admin; #";
+String password = "12345"; // password yang salah
+
+String sql = "SELECT * FROM admin where username= '" + username
+    + "' and password = '" + password
+    + "'";
+
+sql tersebut, apabila di baca dengan data yang sudah dimauskkan menjadi,
+
+SELECT * FROM admin where username = 'admin'; # and password .....
+-> Query berhenti di 'admin'; karena titik koma, dan # berarti query selanjutnya di comment.
+
+Maka untuk query yang kita butuhkan data dinamis, kita gunakan PreparedStatement.
+
+10. PreparedStatement, berbeda dengan Statement, yaitu ketika pembuatannya sudah ditentukan SQL apa yang kita
+gunakan.
+    -> Input dari user perlu diubah menjadi "?", sehingga nanti ketika pembuatan object, kita bisa substitusi
+    datanya menggunakan setXxx(index, value) sesuai dengan tipe datanya
+
+11. Batch Process
+    -> Secara default, komunikasi antara aplikasi dengan database adalah request & response, dan terkadang
+    apabila request yang dikirimkan terlalu banyak, maka akan memperlambat prosesnya.
+    -> Batch process itu adalah proses mengirim perintah secara banyak sekaligus. Yang diutamakan dalam batch
+    process adalah kecepatan.
+        -> Contoh, import data file excel ke database
+    -> Batch Process di JDBC
+        -> JDBC mendukung proses eksekusi perintah SQL secara batch di Statement maupun PreparedStatement
+        -> di Statement, bisa menggunakan addBatch(sql) untuk menambah perintah ke proses batch. Lebih dynamic,
+        SQLnya bisa custom
+        -> di PreparedStatement, juga menggunakan addBatch(sql), lalu juga bisa menggunakan clearParameters()
+        untuk menghapus parameter input user sebelumnya
+        -> Setelah proses batch selesai, untuk eksekusinya bisa menggunakan executeBatch()
+            -> Hanya untuk mengirim data ke database, bukan menerima.
+    -> PERLU DICATAT !!!
+        -> Proses batch akan disimpan di memory sebelum dikirim ke database, oleh karena itu bijak lah dalam
+        membuat batch, misal per 100 atau per 1000 apabila memang datanya sangat banyak.
+
+12. Auto Increment
+    ->

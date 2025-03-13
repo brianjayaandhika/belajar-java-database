@@ -102,4 +102,62 @@ gunakan.
         membuat batch, misal per 100 atau per 1000 apabila memang datanya sangat banyak.
 
 12. Auto Increment
-    ->
+    -> Kadang, setelah melakukan INSERT ke database yang memiliki primary key dengan auto increment, kita ingin
+    mendapatkan data ID terbarunya, sebenarnya bisa dilakukan di MYSQL dengan query SELECT LAST_INSERT_ID(),
+    namun itu berarti kita perlu menambahkan Statement baru untuk query tersebut.
+    -> Di JDBC, ada kemampuan utk auto generate data seperti auto increment dgn method getGenerateKeys() yang
+    mengembalikan ResultSet, yang kemudian kita tinggal lakukan iterasi pada ResultSet tersebut.
+    -> Secara default, Statement atau PreparedStatement tidak memiliki kemampuan untuk mengambil auto generated
+    keys, kita perlu menambahkan ke param ketika kita memanggil prepareStatement() atau createStatement()
+        -> preparedStatement(sql, Statement.RETURN_GENERATED_KEYS)
+        -> Statement(sql, Statement.RETURN_GENERATED_KEYS)
+
+13. Date, Time, and Timestamp
+    -> Hati2 saat menggunakan Date, gunakan java.sql bukan java.util
+
+14. Database Transaction
+    -> Database Transaction adalah serangkaian operasi database yang dianggap sebagai satu kesatuan proses.
+    Jika satu operasi gagal, maka   semua operasi lainnya dalam transaksi tersebut harus dibatalkan agar database
+    tetap dalam keadaan konsisten.
+    -> Auto Commit
+        -> Secara default, Connection di JDBC memiliki sifat auto-commit (artinya tiap query akan langsung dijalankan)
+        -> Dalam database transaction, kita perlu mematikan auto-commit, yaitu dengan menggunakan method di
+        Connection yaitu setAutoCommit(false), setelah proses transaction selesai, kita bisa menggunakan
+        commit() milik Connection
+        -> Atau kalau ingin meng-gagalkan transaction, gunakan rollback()
+
+15. Metadata
+    -> Metadata adalah informasi terkait database yang digunakan. Ada beberapa jenis, diantaranya
+        -> DatabaseMetaData, seluruh informasi terkait database yang digunakan (Connection.getMetaData())
+            - Nama database, Versi database, Table2 di database, dll
+        -> ParameterMetaData, infomrasi seputar parameter yg terdapat di preparedStatement
+            - Jumlah parameter, type parameter
+        -> ResultSetMetaData, infomrasi seputar hasil ResultSet
+            - jumlah kolom, nama kolom, tipe data tiap kolom, dll
+
+16. Repository Pattern
+    -> Biasanya digunakan sebagai jembatan antara business logic aplikasi kita dengan semua perintah SQL ke
+    database.
+    -> Semua perintah SQL kita ditulis di dalam repository, business logicnya cukup memanggil repository saja
+    -> Berikut adalah Diagram Repository Pattern
+        ->
+    Business Logic --(call)--> Repository (interface) --(use)--> Entity/Model (representasi tabel di database)
+                                         |
+                                    (implement)
+                                         |
+                                         v
+                               Repository Implementation --(call)--> Database
+    -> Repository VS DAO (Data Access Object)
+        -> Konsepnya hampir sama, namun Repository tidak menganggap bahwa storage itu hanya database, sedangkan
+        di DAO biasanya storagenya itu adalah database.
+        -> Kedua ini tujuannya sama, untuk meng-enkapsulasi cara mengakses data
+    -> Entity / Model
+        -> Dalam OOP, sebuah tabel di database biasanya akan selalu dibuat representasinya sebagai class Entity
+        atau Model, untuk mempermudah membuat kode program.
+            -> Biasanya tiap2 table akan dibuat classnya sendiri
+        -> Misal kita query ke repository, dibanding mengembalikan ResultSet, akan lebih baik di konversikan dulu
+        di Repositorynya ke class Entity / Model, sehingga kita tinggal gunakan objectnya saja
+
+17. CallableStatement & Store Procedure
+    -> Fitur JDBC untuk memanggil STORE DATABASE di database. Tidak dibahas pada course ini.
+    -> Apabila databasenya masih menggunakan STORE DATABASE, maka WAJIB menggunakan CallableStatement

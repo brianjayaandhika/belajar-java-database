@@ -31,9 +31,9 @@ public class BatchTest {
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             preparedStatement.clearParameters();
-            preparedStatement.setString(1, "email_" + i + "@test.com");
+            preparedStatement.setString(1, "findEmail@test.com");
             preparedStatement.setString(2, "Hi " + i + "x");
 
             preparedStatement.addBatch();
